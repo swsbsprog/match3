@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    static public List<Block> Blocks = new List<Block>();
+    private void Awake() => Blocks.Add(this);
+    private void OnDestroy() => Blocks.Remove(this);
+
     public override string ToString() => $"{name} {type}";
     void OnMouseDown()
     {

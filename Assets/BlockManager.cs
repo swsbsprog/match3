@@ -1,5 +1,6 @@
 using DG.Tweening;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -63,18 +64,88 @@ public class BlockManager : MonoBehaviour
     private void OnCompleteMove()
     {
         print("이동 완료");
-        CheckMatch();
+        StartCoroutine(CheckMatch());
     }
 
     public List<List<Block>> sameBlockList = new List<List<Block>>();
-    private void CheckMatch()
+    private IEnumerator CheckMatch()
     {
         sameBlockList.Clear();
         CheckMatchX();
         CheckMatchY();
         //CheckMatchRectangle();
 
-        DeleteMatchBlockList();
+        bool deletedBlock = DeleteMatchBlockList();
+        if(deletedBlock)
+        {
+            InstantiateNewBlocks();
+            DropBlock();
+            yield return new WaitForSeconds(duration);
+            SetCoordination();
+        }
+    }
+
+    private void SetCoordination()
+    {
+        //위치값을 코디네이션 좌표
+        Dictionary<int, int> map = new Dictionary<int, int>();
+    }
+
+    private void DropBlock()
+    {
+        List<int> needInstantiateX = GetEmptyLineX();
+        for (int i = 0; i < needInstantiateX.Count; i++)
+        {
+            int x = needInstantiateX[i];
+            for (int y = 0; y < MaxY; y++)
+            {
+                var currentBlock = blockMap[new Vector2Int(x, y)];
+                if (currentBlock != null)
+                {
+                    //Vector2Int newPos = GetDropPos(x, y);
+                    //currentBlock.transform.DOMoveY(newPos.y, duration)
+                    //    .SetEase(ease);
+                }
+            }
+        }
+    }
+
+    private void InstantiateNewBlocks()
+    {
+    }
+
+    //private Vector2Int GetDropPos(int x, int y)
+    //{
+    //    //blockMap.
+    //    int stackedCount = 0;
+    //    //int maxY = 0;
+    //    int checkY = 0;
+    //    do
+    //    {
+    //        Vector2Int checkKey = new Vector2Int(x, checkY);
+    //        if(blockMap.ContainsKey(checkKey) && blockMap[checkKey])
+    //            maxY
+    //    } while (true);
+    //}
+
+    private List<int> GetEmptyLineX()
+    {
+        List<int> includeNullX = new List<int>();
+
+        for (int x = 0; x < MaxX; x++)
+        {
+            for (int y = 0; y < MaxY; y++)
+            {
+                var currentBlock = blockMap[new Vector2Int(x, y)];
+                if (currentBlock == null)
+                {
+                    includeNullX.Add(x);
+                    break;
+                }
+            }
+        }
+
+        return includeNullX;
     }
 
     private void CheckMatchY()
@@ -138,16 +209,19 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
-    private void DeleteMatchBlockList()
+    private bool DeleteMatchBlockList()
     {
+        bool deletedBlock = false;
         foreach (var sameGroup in sameBlockList)
         {
             foreach (var block in sameGroup)
             {
                 blockMap[block.Pos] = null;
                 Destroy(block.gameObject);
+                deletedBlock = true;
             }
         }
+        return deletedBlock;
     }
 
 }
