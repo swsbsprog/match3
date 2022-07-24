@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    public override string ToString() => $"{name} {type}";
     void OnMouseDown()
     {
        //Destroy(gameObject);
@@ -47,6 +48,13 @@ public class Block : MonoBehaviour
             nextEnableTouchTime = Time.time + 0.5f;
         }
         previousPos = currentPos;
+    }
+
+    public int type;
+    internal void SetInfo(BlockPlacer.BlockInfo blockInfo)
+    {
+        type = blockInfo.type;
+        GetComponent<SpriteRenderer>().sprite = blockInfo.sprite;
     }
 
     private void Move(int moveX, int moveY)

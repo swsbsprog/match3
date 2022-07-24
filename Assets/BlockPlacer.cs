@@ -6,7 +6,14 @@ using UnityEngine;
 public class BlockPlacer : MonoBehaviour
 {
     static public BlockPlacer instance;
-    public List<Sprite> sprites;
+    
+    [System.Serializable]
+    public class BlockInfo
+    {
+        public int type;
+        public Sprite sprite;
+    }
+    public List<BlockInfo> sprites;
     public Block baseblock;
     public int countX = 7;
     public int countY = 5;
@@ -31,9 +38,9 @@ public class BlockPlacer : MonoBehaviour
         {
             for (int y = 0; y < countY; y++)
             {
-                Sprite sprite = sprites.OrderBy(x => Random.value).First();
+                BlockInfo blockInfo = sprites.OrderBy(x => Random.value).First();
                 var go = Instantiate(baseblock, new Vector3(x, y), Quaternion.Euler(0, 0, 0));
-                go.GetComponent<SpriteRenderer>().sprite = sprite;
+                go.SetInfo(blockInfo);
                 go.name = $"x:{x} y:{y}";
                 blockGoList.Add(go);
             }
